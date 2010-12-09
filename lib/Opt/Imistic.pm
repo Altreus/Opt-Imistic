@@ -33,8 +33,9 @@ sub import {
             # Goodbye, awesome code :(
             # @opts{@opts} = (1) x @opts;
             
-            my $val = _can_has_value();
-            _store(pop @opts, $val) if defined $val;
+            if (defined(my $val = _can_has_value())) {
+                _store(pop @opts, $val);
+            }
 
             _store($_) for @opts;
         }
@@ -45,6 +46,15 @@ sub import {
         }
     }
 
+    for my $o ( keys %opts ) {
+        $opts{$o} = 1 and next if not defined $opts{$o};
+
+        if (ref $opts{$o} eq 'ARRAY') {
+            # provide a count for any option that never got a value.
+            $opts{$o} = @{ $opts{$o} } unless grep defined, @{ $opts{$o} };
+        }
+    }
+
     _store('-', $_) for @ARGV;
 }
 
@@ -52,17 +62,17 @@ sub import {
 sub _store {
     my ($arg, $val) = @_;
 
+    # tm604 suggested that, to accommodate an occurence such as:
+    #   script --opt --opt --opt=foo --opt=123
+    # we create opt => [ undef, undef, 'foo', '123' ].
+    # Then we can collapse undef-only arrayrefs into counts later. So we don't
+    # care if the val is undef. yay!
 
     if (exists $opts{$arg}) {
-        if (defined $val) {
-            $opts{$arg} = [ $opts{$arg} ] unless ref $opts{$arg};
+            $opts{$arg} = [ $opts{$arg} ] unless ref $opts{$arg} eq 'ARRAY';
             push @{ $opts{$arg} }, $val;
-        }
-        else {
-            $opts{$arg}++;
-        }
     } else {
-        $opts{$arg} = $val // 1;
+        $opts{$arg} = $val;
     }
 }
 
