@@ -1,0 +1,9 @@
+To install
+
+  $ dzil install
+
+To use
+
+  use Opt::Imistic;
+  
+After this line, %Opt::Imistic::opts is populated with the parsed @ARGV.
