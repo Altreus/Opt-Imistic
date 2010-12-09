@@ -24,3 +24,7 @@ something like:
 you get word => 'fop' because it incremented it.
 
 Should this be invalid, or should it add a count of un-valued options?
+
+GNU options are not fully represented: single-letter options can take values,
+and these should not require a space between them. A hint is necessary to define
+that as being the case.
