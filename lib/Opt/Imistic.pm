@@ -201,6 +201,8 @@ delimiting from their values
 
 =item Implement further hints to alias options.
 
+=item Implement a required list and a usage string
+
 =back
 
 =head1 AUTHOR
