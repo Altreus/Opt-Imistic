@@ -6,4 +6,9 @@ To use
 
   use Opt::Imistic;
   
-After this line, %Opt::Imistic::opts is populated with the parsed @ARGV.
+After this line, %Opt::Imistic::opts is populated with the parsed @ARGV. See
+example.pl for a demo.
+
+TODO
+
+I have not yet implemented repeated options. I'll do that at lunchtime probably.
