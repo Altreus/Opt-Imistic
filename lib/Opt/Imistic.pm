@@ -3,6 +3,8 @@ package Opt::Imistic;
 use strict;
 use warnings;
 
+our $VERSION = 0.01;
+
 sub import {
     # we alter @ARGV on purpose.
     while (my $arg = shift @ARGV) {
