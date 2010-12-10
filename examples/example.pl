@@ -4,4 +4,4 @@ use warnings;
 use Opt::Imistic;
 use Data::Dumper;
 
-print Dumper (\%Opt::Imistic::opts);
+print Dumper (\%ARGV);
