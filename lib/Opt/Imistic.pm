@@ -4,8 +4,11 @@ use strict;
 use warnings;
 
 our $VERSION = 0.02;
-
+use Data::Dumper;
 sub import {
+    my $package = shift;
+    my %hints = @_;
+
     # we alter @ARGV on purpose.
     while (my $arg = shift @ARGV) {
         last if $arg eq '--';
@@ -57,6 +60,15 @@ sub import {
     }
 
     _store('-', $_) for @ARGV;
+
+    if (exists $hints{demand}) {
+        my $die_message = "Missing option: %s\n";
+        $die_message .= "\n" . $hints{usage} if exists $hints{usage};
+
+        for (@{ $hints{demand} }) {
+            die sprintf($die_message, $_) unless exists $ARGV{$_};
+        }
+    }
 }
 
 # Stores repeated options in an array.
@@ -121,11 +133,11 @@ for you and you might want to try a module such as L<Getopt::Long>.
 
 The hash C<%ARGV> contains your arguments. The argument name is provided as the
 key and the value is provided as the value. If the argument appeared multiple
-times, the values are grouped under the same key as an array ref. If you use the
-same argument multiple times and sometimes without a value then that instance of
-the option will be represented as undef. If you provide the option multiple
-times and none has a value then your value is the count of the number of times
-the option appeared.
+times, the values are grouped as an array ref. If you use the same argument
+multiple times and sometimes without a value then that instance of the option
+will be represented as undef. If you provide the option multiple times and none
+has a value then your value is the count of the number of times the option
+appeared.
 
 Long options start with C<-->. Short options are single letters and start with
 C<->. Multiple short options can be grouped without repeating the C<->.
