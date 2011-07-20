@@ -39,7 +39,12 @@ sub import {
             
             if (defined(my $val = _can_has_value())) {
                 _store(pop @opts, $val);
-            }
+            } elsif (exists $hints{needs_val}{$arg} || exists $hints{demand}{$arg}) {
+				my $die_message = "%s: value required but none given\n";
+				$die_message .= "\n" . $hints{usage} if exists $hints{usage};
+
+				die sprintf $die_message, $arg;
+			}
 
             _store($_) for @opts;
         }
