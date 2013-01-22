@@ -7,7 +7,9 @@ our $VERSION = 0.02;
 use Data::Dumper;
 
 package Opt::Imistic::Option {
-    use overload "" => sub { $_[0]->[-1] }
+    use overload 
+        "" => sub { $_[0]->[-1] },
+        'bool' => 1
 }
 
 sub import {
@@ -61,12 +63,9 @@ sub import {
     }
 
     for my $o ( keys %ARGV ) {
-        do { $ARGV{$o} = 1; next } if not defined $ARGV{$o};
-
-        if (ref $ARGV{$o} eq 'ARRAY') {
-            # provide a count for any option that never got a value.
-            $ARGV{$o} = @{ $ARGV{$o} } unless grep defined, @{ $ARGV{$o} };
-        }
+        # All args are arrayrefs now. This implements tm604's suggestion that we assume 
+        # it's a countable option if it appears several times, but never with a value.
+        $ARGV{$o} = @{ $ARGV{$o} } unless grep defined, @{ $ARGV{$o} };
     }
 
     _store('-', $_) for @ARGV;
