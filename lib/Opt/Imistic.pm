@@ -7,7 +7,7 @@ our $VERSION = 0.02;
 use Data::Dumper;
 
 package Opt::Imistic::Option {
-    use overload "" => sub { $_[0]->[0] }
+    use overload "" => sub { $_[0]->[-1] }
 }
 
 sub import {
