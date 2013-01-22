@@ -137,24 +137,67 @@ and parses your options. If you need more control over it, Opt::Imistic is not
 for you and you might want to try a module such as L<Getopt::Long>.
 
 The hash C<%ARGV> contains your arguments. The argument name is provided as the
-key and the value is provided as the value. If the argument appeared multiple
-times, the values are grouped as an array ref. If you use the same argument
+key and the value is provided as the value. If you use the same argument
 multiple times and sometimes without a value then that instance of the option
 will be represented as undef. If you provide the option multiple times and none
 has a value then your value is the count of the number of times the option
 appeared.
 
+All arguments in C<%ARGV> are now represented as array refs, blessed into a
+package that stringifies them to the last instance of that argument and
+boolifies to true. That means that you can always do
+
+    @{$ARGV}{option_name}
+
+or
+
+    $ARGV{option_name} =~ /cats/
+
+or
+
+    if ($ARGV{option_name})
+
+without having to test what $ARGV{option_name} actually is.
+
+This basically means that the way you use the option determines what it should
+have been:
+
+=over
+
+=item Using it as an array ref means you expected zero or more values from it.
+
+=item Using it as a string or number means you expected a single value out of
+it.
+
+=item Testing it means you only cared whether it was present or not.
+
+=back
+
+To follow convention, when you try to use an argument as a string, the end of
+the internal arrayref is returned: this implements the common behaviour that the
+I<last> option of the same name is honoured.
+
+=head2 Options and arguments
+
 Long options start with C<-->. Short options are single letters and start with
-C<->. Multiple short options can be grouped without repeating the C<->.
-Currently the value I<must> be separated from the option letter in the case of
-short options; but for long options, both whitespace and a single C<=> are
-considered delimiters.
+C<->. Multiple short options can be grouped without repeating the C<->, in the
+familiar C<perl -lne> fashion.
+
+For short options the value I<must> be separated from the option letter; but for
+long options, both whitespace and a single C<=> are considered delimiters. This
+is because Opt::Imistic doesn't take an option spec, and hence cannot
+distinguish between single-letter options with values and several single-letter
+options.
+
+Repeated options with no values are counted. Repeated options with values are
+concatenated in an array ref. Note that all options can be treated as array
+refs.
 
 The options are considered to stop on the first argument that does not start
 with a C<-> and cannot be construed as the value to an option. You can use the
 standard C<--> to force the end of option parsing. Everything after the last
-option goes under the special key C<->, which can never be an option name. These
-are also left on @ARGV so that C<< <> >> still works.
+option goes under the special key C<->, because that can never be an option
+name. These are also left on @ARGV so that C<< <> >> still works.
 
 Examples help
 
@@ -170,7 +213,7 @@ That one's obvious.
 
     script.pl -a foo.pl
 
-    a => 'foo.pl'
+    a => ['foo.pl']
 
     @ARGV = ()
 
@@ -178,8 +221,8 @@ Z<>
 
     script.pl -a -- foo.pl
 
-    a => 1
-    - => 'foo.pl'
+    a => [ 1 ]
+    - => [ 'foo.pl' ]
 
     @ARGV = ('foo.pl')
 
@@ -187,14 +230,14 @@ Z<>
     
     script.pl -foo
 
-    f => 1
-    o => 2
+    f => [ 1 ]
+    o => [ 2 ]
 
 Z<>
 
     script.pl -foo bar
 
-    f => 1
+    f => [ 1 ]
     o => [undef, 'bar']
     
 Z<>
@@ -203,7 +246,7 @@ Z<>
 
     foo => ['bar', 'bar']
 
-Z<>    
+Z<> 
 
 =head1 BUGS AND TODOS
 
