@@ -5,6 +5,11 @@ use warnings;
 
 our $VERSION = 0.02;
 use Data::Dumper;
+
+package Opt::Imistic::Option {
+    use overload "" => sub { $_[0]->[0] }
+}
+
 sub import {
     my $package = shift;
     my %hints = @_;
@@ -86,12 +91,8 @@ sub _store {
     # Then we can collapse undef-only arrayrefs into counts later. So we don't
     # care if the val is undef. yay!
 
-    if (exists $ARGV{$arg}) {
-            $ARGV{$arg} = [ $ARGV{$arg} ] unless ref $ARGV{$arg} eq 'ARRAY';
-            push @{ $ARGV{$arg} }, $val;
-    } else {
-        $ARGV{$arg} = $val;
-    }
+    $ARGV{$arg} //= bless [], "Opt::Imistic::Option";
+    push @{ $ARGV{$arg} }, $val;
 }
 
 # Checks to see whether the next @ARGV is a value and returns it if so.
