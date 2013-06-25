@@ -6,25 +6,9 @@ To use
 
   use Opt::Imistic;
   
-After this line, %Opt::Imistic::opts is populated with the parsed @ARGV. See
+After this line, %ARGV is populated with the parsed @ARGV. See
 example.pl for a demo.
 
-TODO
+See the POD for more details
 
-Allow supplying of defaults. Requested by f00li5h, who doesn't like to have to
-do $opts{v} //= 0 a lot.
-
-The repeated option thing does have a bug. Currently it doesn't remember that
-the option didn't have a value. That means it just increments the existing value
-if the option is encountered again. That, in turn, means that if you do
-something like:
-
-  example.pl --word=foo --word
-
-you get word => 'fop' because it incremented it.
-
-Should this be invalid, or should it add a count of un-valued options?
-
-GNU options are not fully represented: single-letter options can take values,
-and these should not require a space between them. A hint is necessary to define
-that as being the case.
+  perldoc Opt::Imistic
