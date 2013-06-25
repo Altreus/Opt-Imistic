@@ -250,9 +250,11 @@ Z<>
 
 =head1 BUGS AND TODOS
 
-No known bugs, but undesirable behaviour should be reported.
+It should be noted that Opt::Imistic does not observe a difference between C<-f> and C<--f>.
 
-Please note the TODO list first:
+No known bugs.
+
+Please report undesirable behaviour, but note the TODO list first:
 
 =over
 
