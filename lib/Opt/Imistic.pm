@@ -19,7 +19,7 @@ sub import {
 
     {
         no warnings qw(uninitialized numeric);
-        if (int $_[0] == $_[0]) {
+        if (@_ and int $_[0] eq $_[0]) {
             $putback = shift;
         }
     }
