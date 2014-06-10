@@ -7,9 +7,9 @@ our $VERSION = 0.03;
 use Data::Dumper;
 
 package Opt::Imistic::Option {
-    use overload 
-        "" => sub { $_[0]->[-1] },
-        'bool' => 1
+    use overload
+        '""' => sub { $_[0]->[-1] },
+        'bool' => sub { 1 }
 }
 
 sub import {
@@ -41,12 +41,10 @@ sub import {
             substr $arg, 0, 1, '';
             my @opts = split //, $arg;
 
-            # Goodbye, awesome code :(
-            # @opts{@opts} = (1) x @opts;
-            
             if (defined(my $val = _can_has_value())) {
                 _store(pop @opts, $val);
-            } elsif (exists $hints{needs_val}{$arg} || exists $hints{demand}{$arg}) {
+            }
+            elsif (exists $hints{needs_val}{$arg} || exists $hints{demand}{$arg}) {
 				my $die_message = "%s: value required but none given\n";
 				$die_message .= "\n" . $hints{usage} if exists $hints{usage};
 
@@ -63,7 +61,7 @@ sub import {
     }
 
     for my $o ( keys %ARGV ) {
-        # All args are arrayrefs now. This implements tm604's suggestion that we assume 
+        # All args are arrayrefs now. This implements tm604's suggestion that we assume
         # it's a countable option if it appears several times, but never with a value.
         $ARGV{$o} = [ scalar @{ $ARGV{$o} } ] unless grep defined, @{ $ARGV{$o} };
     }
@@ -74,7 +72,7 @@ sub import {
         my $die_message = "Missing option: %s\n";
         $die_message .= "\n" . $hints{usage} if exists $hints{usage};
 
-        for (@{ $hints{demand} }) {
+        for (keys %{ $hints{demand} }) {
             die sprintf($die_message, $_) unless exists $ARGV{$_};
         }
     }
