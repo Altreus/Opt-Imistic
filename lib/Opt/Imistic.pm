@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 our $VERSION = 0.03;
-use Data::Dumper;
 
 package Opt::Imistic::Option {
     use overload
