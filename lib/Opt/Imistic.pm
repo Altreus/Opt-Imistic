@@ -12,9 +12,24 @@ package Opt::Imistic::Option {
         'bool' => sub { 1 }
 }
 
+my $putback = 0;
+my %hints;
+
 sub import {
     my $package = shift;
-    my %hints = @_;
+
+    {
+        no warnings qw(uninitialized numeric);
+        if (int $_[0] == $_[0]) {
+            $putback = shift;
+        }
+    }
+
+    %hints = @_;
+
+    if ($putback and @ARGV < $putback) {
+        _not_enough_args();
+    }
 
     # we alter @ARGV on purpose.
     while (my $arg = shift @ARGV) {
@@ -98,17 +113,35 @@ sub _store {
 sub _can_has_value {
     my $val = $ARGV[0];
 
-    if ($val eq '-') {
-        return shift @ARGV;
-    }
-
-    if (index($val, '-') == 0) {
+    if (index($val, '-') == 0 and $val ne '-') {
         # starts with - but isn't - means option. (Includes --)
         return;
     }
 
+    if ($putback <= @ARGV) {
+        # next thing is not an option; we keep this many.
+        return;
+    }
+
+    if ($putback > @ARGV) {
+        # next thing is not an option; not enough things left.
+        _not_enough_args();
+    }
+
     return shift @ARGV;
 }
+
+# We couldn't satisfy $putback
+sub _not_enough_args {
+    my $die = "Expected $putback arguments; " . @ARGV . " given\n";
+
+    if ($hints{usage}) {
+        $die .= "\n" . $hints{usage};
+    }
+
+    die $die;
+}
+
 1;
 
 __END__
