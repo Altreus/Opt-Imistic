@@ -48,6 +48,13 @@ sub import {
                 $val = _can_has_value();
             }
 
+            if (exists $hints{needs_val}{$arg} || exists $hints{demand}{$arg}) {
+				my $die_message = "%s: value required but none given\n";
+				$die_message .= "\n" . $hints{usage} if exists $hints{usage};
+
+				die sprintf $die_message, $arg;
+			}
+
             _store($arg, $val);
         }
         elsif (substr($arg, 0, 1) eq '-') {
@@ -112,12 +119,14 @@ sub _store {
 sub _can_has_value {
     my $val = $ARGV[0];
 
+    return if not defined $val;
+
     if (index($val, '-') == 0 and $val ne '-') {
         # starts with - but isn't - means option. (Includes --)
         return;
     }
 
-    if ($putback <= @ARGV) {
+    if ($putback == @ARGV) {
         # next thing is not an option; we keep this many.
         return;
     }
@@ -127,6 +136,7 @@ sub _can_has_value {
         _not_enough_args();
     }
 
+    # Next thing is an option and there are *more than* $putback args - we shift.
     return shift @ARGV;
 }
 
