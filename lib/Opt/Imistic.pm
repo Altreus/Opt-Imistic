@@ -84,7 +84,7 @@ sub import {
     for my $o ( keys %ARGV ) {
         # All args are arrayrefs now. This implements tm604's suggestion that we assume
         # it's a countable option if it appears several times, but never with a value.
-        $ARGV{$o} = [ scalar @{ $ARGV{$o} } ] unless grep defined, @{ $ARGV{$o} };
+        @{$ARGV{$o}} = scalar @{ $ARGV{$o} } unless grep defined, @{ $ARGV{$o} };
     }
 
     _store('-', $_) for @ARGV;
